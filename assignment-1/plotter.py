@@ -50,7 +50,7 @@ def plot_line_3D(ax: plt.axes, p1:np.ndarray, p2:np.ndarray) -> plt.axes:
     return ax
 
 # Function to plot coordinates in 2D
-def plot_points_2D(ax: plt.axes, points: np.ndarray) -> None:
+def plot_points_2D(ax: plt.axes, points: np.ndarray, c=None) -> None:
     ''' Plot points in 2D space
 
     Plots all 'n' points (2 x n) using matplotlib.
@@ -62,6 +62,9 @@ def plot_points_2D(ax: plt.axes, points: np.ndarray) -> None:
 
     points: np.ndarray
         A 2 x n matrix representing 'n' points
+
+    c: str (default None)
+        A color string to pass to matplotlib. If None then use y-value.
     
     Returns
     plt.axes
@@ -69,7 +72,8 @@ def plot_points_2D(ax: plt.axes, points: np.ndarray) -> None:
         The surface plotted on. Can be used for further plotting
 
     '''
-    ax.scatter(points[0,:], points[1,:], c=points[1,:])
+
+    ax.scatter(points[0,:], points[1,:], c=c)
     ax.set_aspect('equal')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
