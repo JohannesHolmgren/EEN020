@@ -66,3 +66,25 @@ def camera_center_and_axis(P: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     principal_axis_norm = principal_axis / np.linalg.norm(principal_axis)
 
     return (camera_center_cart, principal_axis_norm)
+
+
+def flip_points(xs: np.ndarray, height: np.ndarray) -> np.ndarray:
+    ''' Flip points along their y-axis
+
+    Parameters
+    ----------
+    xs: np.ndarray
+        The points to flip
+
+    height : float
+        The height of the image
+
+    Returns
+    -------
+    np.ndarray
+        The flipped points
+    
+    '''
+    flipped = xs.copy()
+    flipped[1, :] = height - xs[1,:]
+    return flipped
