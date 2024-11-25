@@ -68,13 +68,13 @@ def plot_points_2D(ax: plt.axes, points: np.ndarray, c=None, s=1, rev=False) -> 
 
     s: float (default 1)
         Scale of the points
-    
+
     Returns
     plt.axes
     -------
         The surface plotted on. Can be used for further plotting
 
-    '''
+    ''' 
     if rev:
         ax.scatter(points[1,:], points[0,:], c=c, s=s)
     else:
