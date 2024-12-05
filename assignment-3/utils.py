@@ -117,3 +117,74 @@ def get_normalization_matrix(xs: np.ndarray) -> np.ndarray:
         [0,               0,             1]
     ])
     return N
+
+
+def triangulate_3D_point_DLT(xs1: np.ndarray, xs2: np.ndarray, P1: np.ndarray, P2: np.ndarray) -> np.ndarray:
+    ''' Triangulate 3D points X projected into x1 and x2 using P1 and P2.
+
+    Parameters
+    ----------
+    xs1: np.ndarray
+        Points projected into P1 in homogeneous coordinates (3 x N)
+
+    xs2: np.ndarray
+        Points projected into P2 in homogeneous coordinates (3 x N)
+
+    P1: np.ndarray
+        Camera matrix for camera 1 (3 x 4)
+    
+    P2: np.ndarray
+        Camera matrix for camera 2 (3 x 4)
+
+    Returns
+    -------
+    np.ndarray
+        The triangulated 3D points in homogeneous coordinates (4 x N)
+    '''
+    Xs = []
+    for x1, x2 in zip(xs1.T, xs2.T):
+
+        zeros = np.zeros_like(x1).reshape(-1, 1)
+        
+        M = np.vstack([
+            np.hstack([P1, -x1.reshape(-1, 1), zeros]),
+            np.hstack([P2, zeros, -x2.reshape(-1, 1)])
+        ])
+        U, S, Vh = np.linalg.svd(M)
+        v = Vh[-1]
+        Xs.append(v[:4])
+    Xs = np.array(Xs).T
+    Xs = pflat(Xs)
+    return Xs
+
+    Xs = []
+    for x1, x2 in zip(xs1.T, xs2.T):
+        A = np.array([
+            x1[0] * P1[2, :] - P1[0, :],
+            x1[1] * P1[2, :] - P1[1, :],
+            x2[0] * P2[2, :] - P2[0, :],
+            x2[1] * P2[2, :] - P2[1, :]
+        ])
+        
+        # Solve the system AX = 0 using SVD
+        _, _, Vh = np.linalg.svd(A)
+        X = Vh[-1]  # The last row of Vh corresponds to the solution
+        Xs.append(X / X[-1])  # Normalize to make homogeneous
+
+    return np.array(Xs).T  # Return as a 4 x N array
+
+
+if __name__ == '__main__':
+    P1 = np.eye(3, 4)
+    P2 = np.array([
+        [ 0.62208686  ,0.27002211  ,0.73491224  ,0.92229092],
+        [ 0.28035671  ,-0.95323078 ,0.11292118  ,0.14220198],
+        [ 0.73103218  ,0.13579079  ,-0.66869485  ,0.35938565]
+    ])
+    x1 = np.array([145.56 ,466.02 ,1])
+    x2 = np.array([81.98 ,484.7 ,1])
+
+
+    # print(np.hstack([x1.reshape(-1, 1), np.zeros_like(x1).reshape(-1, 1)]))
+    
+    triangulate_3D_point_DLT(np.array(np.array([x1]).reshape(-1, 1)), np.array(np.array([x2]).reshape(-1, 1)), P1, P2)
